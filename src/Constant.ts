@@ -4,4 +4,6 @@ const TOTAL_POSITIVE_URL =
 const TOTAL_DEATH_URL =
   'https://raw.githubusercontent.com/MoH-Malaysia/covid19-public/main/epidemic/deaths_malaysia.csv'
 
-export { TOTAL_POSITIVE_URL, TOTAL_DEATH_URL }
+const ALLOWED_INTERVAL = ['daily', 'weekly', 'monthly']
+
+export { TOTAL_POSITIVE_URL, TOTAL_DEATH_URL, ALLOWED_INTERVAL }
