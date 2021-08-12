@@ -9,7 +9,8 @@ addEventListener('fetch', (event) => {
 
   // Call the handler if request matched with routes we specified using
   // tiny-request-router
-  if (matchedRoute) event.respondWith(matchedRoute.handler(event.request))
+  if (matchedRoute)
+    event.respondWith(matchedRoute.handler(event.request, matchedRoute.params))
   else event.respondWith(notFoundException())
 })
 

@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
 import Papa from 'papaparse'
+import { Params } from 'tiny-request-router'
+import { corsHeaders } from '../config/CORS'
 import { ALLOWED_INTERVAL, TOTAL_VACCINATED_URL } from '../Constant'
 
 interface ParsedCsv {
@@ -27,17 +29,8 @@ interface Datum {
   total_cumul: string
 }
 
-export default async function (request: Request) {
-  let params
-  // Try to parse body
-  try {
-    const textData = await request.text()
-    params = JSON.parse(textData)
-  } catch (error) {
-    console.log('Request have no data')
-  }
-
-  const { interval } = params
+export default async function (request: Request, qs: Params) {
+  const { interval } = qs
 
   // Check for valid interval
   try {
@@ -51,6 +44,9 @@ export default async function (request: Request) {
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 422,
+      headers: {
+        ...corsHeaders,
+      },
     })
   }
 
@@ -160,10 +156,17 @@ export default async function (request: Request) {
       }
     }
 
-    return new Response(JSON.stringify({ ...responseData }))
+    return new Response(JSON.stringify({ ...responseData }), {
+      headers: {
+        ...corsHeaders,
+      },
+    })
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 400,
+      headers: {
+        ...corsHeaders,
+      },
     })
   }
 }

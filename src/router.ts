@@ -11,9 +11,9 @@ router.get('/', async () => {
   return new Response('SC2-Malaysia API')
 })
 
-router.get('/total', TotalCasesController)
-router.get('/death', TotalDeathController)
-router.get('/vaccinated', TotalVaccinatedController)
+router.get('/total/:interval', TotalCasesController)
+router.get('/death/:interval', TotalDeathController)
+router.get('/vaccinated/:interval', TotalVaccinatedController)
 router.options('*', handleOptionsPreflight)
 
 export default router
