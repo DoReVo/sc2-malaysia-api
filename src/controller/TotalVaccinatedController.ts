@@ -83,6 +83,7 @@ export default async function (request: Request, qs: Params) {
         total: Number(latest?.total_daily),
         firstDose: Number(latest?.dose1_daily),
         secondDose: Number(latest?.dose2_daily),
+        as_of: latest?.date,
       }
     }
     // Weekly vaccinated
@@ -114,10 +115,13 @@ export default async function (request: Request, qs: Params) {
         return acc
       }, 0)
 
+      const latest = data[data.length - 1]
+
       responseData = {
         total: totalWeek,
         firstDose: firstDoseWeek,
         secondDose: secondDoseWeek,
+        as_of: latest?.date,
       }
     }
     // Monthly vaccinated
@@ -149,10 +153,13 @@ export default async function (request: Request, qs: Params) {
         return acc
       }, 0)
 
+      const latest = data[data.length - 1]
+
       responseData = {
         total: totalMonth,
         firstDose: firstDoseMonth,
         secondDose: secondDoseMonth,
+        as_of: latest?.date,
       }
     }
 

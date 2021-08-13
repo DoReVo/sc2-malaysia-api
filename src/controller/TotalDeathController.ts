@@ -74,7 +74,7 @@ export default async function (request: Request, qs: Params) {
     // Daily deaths
     if (interval === 'daily') {
       const latest = data.pop()
-      responseData = { deaths: Number(latest?.deaths_new) }
+      responseData = { deaths: Number(latest?.deaths_new), as_of: latest?.date }
     }
     // Weekly deaths
     else if (interval === 'weekly') {
@@ -87,7 +87,8 @@ export default async function (request: Request, qs: Params) {
         return acc
       }, 0)
 
-      responseData = { deaths: totalWeek }
+      const latest = data[data.length - 1]
+      responseData = { deaths: totalWeek, as_of: latest?.date }
     }
     // Monthly deaths
     else if (interval === 'monthly') {
@@ -100,7 +101,8 @@ export default async function (request: Request, qs: Params) {
         return acc
       }, 0)
 
-      responseData = { deaths: totalMonth }
+      const latest = data[data.length - 1]
+      responseData = { deaths: totalMonth, as_of: latest?.date }
     }
 
     return new Response(JSON.stringify({ ...responseData }), {

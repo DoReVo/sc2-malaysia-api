@@ -89,7 +89,7 @@ export default async function (request: Request, qs: Params) {
     // Daily cases
     if (interval === 'daily') {
       const latest = data.pop()
-      responseData = { cases: Number(latest?.cases_new) }
+      responseData = { cases: Number(latest?.cases_new), as_of: latest?.date }
     }
     // Weekly cases
     else if (interval === 'weekly') {
@@ -102,7 +102,9 @@ export default async function (request: Request, qs: Params) {
         return acc
       }, 0)
 
-      responseData = { cases: totalWeek }
+      const latest = data[data.length - 1]
+
+      responseData = { cases: totalWeek, as_of: latest?.date }
     }
     // Monthly cases
     else if (interval === 'monthly') {
@@ -115,7 +117,8 @@ export default async function (request: Request, qs: Params) {
         return acc
       }, 0)
 
-      responseData = { cases: totalMonth }
+      const latest = data[data.length - 1]
+      responseData = { cases: totalMonth, as_of: latest?.date }
     }
 
     return new Response(JSON.stringify({ ...responseData }), {
