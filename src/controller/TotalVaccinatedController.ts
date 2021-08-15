@@ -1,33 +1,8 @@
-import { DateTime } from 'luxon'
-import Papa from 'papaparse'
 import { Params } from 'tiny-request-router'
 import { corsHeaders } from '../config/CORS'
-import { ALLOWED_INTERVAL, TOTAL_VACCINATED_URL } from '../Constant'
-
-interface ParsedCsv {
-  data: Datum[]
-  errors: any[]
-  meta: Meta
-}
-
-interface Meta {
-  delimiter: string
-  linebreak: string
-  aborted: boolean
-  truncated: boolean
-  cursor: number
-  fields: string[]
-}
-
-interface Datum {
-  date: string
-  dose1_daily: string
-  dose2_daily: string
-  total_daily: string
-  dose1_cumul: string
-  dose2_cumul: string
-  total_cumul: string
-}
+import { ALLOWED_INTERVAL } from '../Constant'
+import VaccinatedMalaysia from '../cron/VaccinatedMalaysia'
+import { CachedData, Interval, KVCache } from '../types/Data'
 
 export default async function (request: Request, qs: Params) {
   const { interval } = qs
@@ -51,119 +26,20 @@ export default async function (request: Request, qs: Params) {
   }
 
   try {
-    const res = await fetch(TOTAL_VACCINATED_URL, {
-      method: 'GET',
-      headers: {
-        Accept: 'text/plain',
-      },
-    })
+    let vaccinated: CachedData<KVCache.Vaccinated> | null = await SC2.get(
+      'vaccinated',
+      'json',
+    )
 
-    const textData = await res.text()
+    if (vaccinated === null)
+      vaccinated = (await VaccinatedMalaysia(
+        true,
+      )) as CachedData<KVCache.Vaccinated>
 
-    const { data } = Papa.parse(textData, {
-      header: true,
-      skipEmptyLines: true,
-    }) as unknown as ParsedCsv
+    const intv: Interval = interval as Interval
 
-    let responseData
-
-    const now = DateTime.now()
-    // Start and end of week date
-    const bWeek = now.startOf('week')
-    const eWeek = now.endOf('week')
-
-    // Start and end of month date
-    const bMonth = now.startOf('month')
-    const eMonth = now.endOf('month')
-
-    // Daily vaccinated
-    if (interval === 'daily') {
-      const latest = data.pop()
-      responseData = {
-        total: Number(latest?.total_daily),
-        firstDose: Number(latest?.dose1_daily),
-        secondDose: Number(latest?.dose2_daily),
-        as_of: latest?.date,
-      }
-    }
-    // Weekly vaccinated
-    else if (interval === 'weekly') {
-      const totalWeek = data.reduce((acc, day): number => {
-        const date = DateTime.fromISO(day.date)
-        if (date <= eWeek && date >= bWeek) {
-          return (acc + Number(day!.total_daily)) as unknown as number
-        }
-
-        return acc
-      }, 0)
-
-      const firstDoseWeek = data.reduce((acc, day): number => {
-        const date = DateTime.fromISO(day.date)
-        if (date <= eWeek && date >= bWeek) {
-          return (acc + Number(day!.dose1_daily)) as unknown as number
-        }
-
-        return acc
-      }, 0)
-
-      const secondDoseWeek = data.reduce((acc, day): number => {
-        const date = DateTime.fromISO(day.date)
-        if (date <= eWeek && date >= bWeek) {
-          return (acc + Number(day!.dose2_daily)) as unknown as number
-        }
-
-        return acc
-      }, 0)
-
-      const latest = data[data.length - 1]
-
-      responseData = {
-        total: totalWeek,
-        firstDose: firstDoseWeek,
-        secondDose: secondDoseWeek,
-        as_of: latest?.date,
-      }
-    }
-    // Monthly vaccinated
-    else if (interval === 'monthly') {
-      const totalMonth = data.reduce((acc, day): number => {
-        const date = DateTime.fromISO(day.date)
-        if (date <= eMonth && date >= bMonth) {
-          return (acc + Number(day!.total_daily)) as unknown as number
-        }
-
-        return acc
-      }, 0)
-
-      const firstDoseMonth = data.reduce((acc, day): number => {
-        const date = DateTime.fromISO(day.date)
-        if (date <= eMonth && date >= bMonth) {
-          return (acc + Number(day!.dose1_daily)) as unknown as number
-        }
-
-        return acc
-      }, 0)
-
-      const secondDoseMonth = data.reduce((acc, day): number => {
-        const date = DateTime.fromISO(day.date)
-        if (date <= eMonth && date >= bMonth) {
-          return (acc + Number(day!.dose2_daily)) as unknown as number
-        }
-
-        return acc
-      }, 0)
-
-      const latest = data[data.length - 1]
-
-      responseData = {
-        total: totalMonth,
-        firstDose: firstDoseMonth,
-        secondDose: secondDoseMonth,
-        as_of: latest?.date,
-      }
-    }
-
-    return new Response(JSON.stringify({ ...responseData }), {
+    return new Response(JSON.stringify(vaccinated[intv]), {
+      status: 200,
       headers: {
         ...corsHeaders,
       },

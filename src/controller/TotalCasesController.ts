@@ -1,45 +1,11 @@
-import { DateTime } from 'luxon'
-import papa from 'papaparse'
 import { Params } from 'tiny-request-router'
 import { corsHeaders } from '../config/CORS'
-import { ALLOWED_INTERVAL, TOTAL_POSITIVE_URL } from '../Constant'
-
-interface ParsedCsv {
-  data: Datum[]
-  errors: Error[]
-  meta: Meta
-}
-
-interface Meta {
-  delimiter: string
-  linebreak: string
-  aborted: boolean
-  truncated: boolean
-  cursor: number
-  fields: string[]
-}
-
-interface Error {
-  type: string
-  code: string
-  message: string
-  row: number
-}
-
-interface Datum {
-  date: string
-  cases_new?: string
-  cluster_import?: string
-  cluster_religious?: string
-  cluster_community?: string
-  cluster_highRisk?: string
-  cluster_education?: string
-  cluster_detentionCentre?: string
-  cluster_workplace?: string
-}
+import { ALLOWED_INTERVAL } from '../Constant'
+import CasesMalaysia from '../cron/CasesMalaysia'
+import { CachedData, Interval, KVCache } from '../types/Data'
 
 export default async function (request: Request, qs: Params) {
-  const { interval } = qs
+  let { interval } = qs
 
   // Check for valid interval
   try {
@@ -60,68 +26,15 @@ export default async function (request: Request, qs: Params) {
   }
 
   try {
-    // Get all positive cases
-    const res = await fetch(TOTAL_POSITIVE_URL, {
-      method: 'GET',
-      headers: {
-        Accept: 'text/plain',
-      },
-    })
-    // convert to csv text
-    const textData = await res.text()
-    // Parsed csv text into json
-    const { data }: ParsedCsv = papa.parse(textData, {
-      header: true,
-      skipEmptyLines: true,
-    }) as unknown as ParsedCsv
+    let cases: CachedData<KVCache.Cases> | null = await SC2.get('cases', 'json')
 
-    let responseData
+    if (cases === null)
+      cases = (await CasesMalaysia(true)) as CachedData<KVCache.Cases>
 
-    const now = DateTime.now()
-    // Start and end of week date
-    const bWeek = now.startOf('week')
-    const eWeek = now.endOf('week')
+    const intv: Interval = interval as Interval
 
-    // Start and end of month date
-    const bMonth = now.startOf('month')
-    const eMonth = now.endOf('month')
-
-    // Daily cases
-    if (interval === 'daily') {
-      const latest = data.pop()
-      responseData = { cases: Number(latest?.cases_new), as_of: latest?.date }
-    }
-    // Weekly cases
-    else if (interval === 'weekly') {
-      const totalWeek = data.reduce((acc, day): number => {
-        const date = DateTime.fromISO(day.date)
-        if (date <= eWeek && date >= bWeek) {
-          return (acc + Number(day!.cases_new!)) as unknown as number
-        }
-
-        return acc
-      }, 0)
-
-      const latest = data[data.length - 1]
-
-      responseData = { cases: totalWeek, as_of: latest?.date }
-    }
-    // Monthly cases
-    else if (interval === 'monthly') {
-      const totalMonth = data.reduce((acc, day): number => {
-        const date = DateTime.fromISO(day.date)
-        if (date <= eMonth && date >= bMonth) {
-          return (acc + Number(day!.cases_new!)) as unknown as number
-        }
-
-        return acc
-      }, 0)
-
-      const latest = data[data.length - 1]
-      responseData = { cases: totalMonth, as_of: latest?.date }
-    }
-
-    return new Response(JSON.stringify({ ...responseData }), {
+    return new Response(JSON.stringify(cases[intv]), {
+      status: 200,
       headers: {
         ...corsHeaders,
       },

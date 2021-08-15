@@ -1,5 +1,10 @@
 import { Method } from 'tiny-request-router'
+import { startScrape } from './cron'
 import router from './router'
+
+addEventListener('scheduled', (event) => {
+  event.waitUntil(startScrape())
+})
 
 addEventListener('fetch', (event) => {
   const { pathname } = new URL(event.request.url)
