@@ -2,7 +2,7 @@ import FetchConfig from '../config/Fetch'
 import { CASES_MALAYSIA_URL } from '../Constant'
 import { parse, ParseResult } from 'papaparse'
 import PapaParseConfig from '../config/PapaParse'
-import { API, CachedData, KVCache } from '../types/Data'
+import { API, CachedData, KVCache, PerfomanceData } from '../types/Data'
 import ExtractData from '../utility/ExtractData'
 
 export default async (
@@ -24,19 +24,28 @@ export default async (
   ])
 
   // Daily Cases data
-  const dailyData: KVCache.Cases = {
+  const dailyData: KVCache.Cases & PerfomanceData<KVCache.Cases> = {
     cases: Number(daily.cases_new ? daily.cases_new : 0),
     as_of: data[data.length - 1]!.date,
+    perfomanceBetweenInterval: {
+      cases: daily?.perfomanceBetweenInterval?.cases_new ?? (null as any),
+    },
   }
 
-  const weeklyData: KVCache.Cases = {
+  const weeklyData: KVCache.Cases & PerfomanceData<KVCache.Cases> = {
     cases: Number(weekly.cases_new ? weekly.cases_new : 0),
     as_of: data[data.length - 1]!.date,
+    perfomanceBetweenInterval: {
+      cases: weekly?.perfomanceBetweenInterval?.cases_new ?? (null as any),
+    },
   }
 
-  const monthlyData: KVCache.Cases = {
+  const monthlyData: KVCache.Cases & PerfomanceData<KVCache.Cases> = {
     cases: Number(monthly.cases_new ? monthly.cases_new : 0),
     as_of: data[data.length - 1]!.date,
+    perfomanceBetweenInterval: {
+      cases: monthly?.perfomanceBetweenInterval?.cases_new ?? (null as any),
+    },
   }
 
   const cases: CachedData<KVCache.Cases> = {

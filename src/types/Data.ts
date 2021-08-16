@@ -57,3 +57,7 @@ export interface CachedData<T> {
 }
 
 export type Interval = 'daily' | 'weekly' | 'monthly'
+
+export interface PerfomanceData<T> {
+  perfomanceBetweenInterval: Partial<T>
+}
