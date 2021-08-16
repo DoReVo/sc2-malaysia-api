@@ -24,17 +24,17 @@ export default async (
   ])
 
   const dailyData: KVCache.Deaths = {
-    deaths: Number(daily.deaths_new || 0),
+    deaths: Number(daily.deaths_new ? daily.deaths_new : 0),
     as_of: data[data.length - 1].date,
   }
 
   const weeklyData: KVCache.Deaths = {
-    deaths: Number(weekly.deaths_new || 0),
+    deaths: Number(weekly.deaths_new ? weekly.deaths_new : 0),
     as_of: data[data.length - 1].date,
   }
 
   const monthlyData: KVCache.Deaths = {
-    deaths: Number(monthly.deaths_new || 0),
+    deaths: Number(monthly.deaths_new ? monthly.deaths_new : 0),
     as_of: data[data.length - 1].date,
   }
 
