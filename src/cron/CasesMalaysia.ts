@@ -25,17 +25,17 @@ export default async (
 
   // Daily Cases data
   const dailyData: KVCache.Cases = {
-    cases: Number(daily.cases_new),
+    cases: Number(daily.cases_new || 0),
     as_of: data[data.length - 1]!.date,
   }
 
   const weeklyData: KVCache.Cases = {
-    cases: Number(weekly.cases_new),
+    cases: Number(weekly.cases_new || 0),
     as_of: data[data.length - 1]!.date,
   }
 
   const monthlyData: KVCache.Cases = {
-    cases: Number(monthly.cases_new),
+    cases: Number(monthly.cases_new || 0),
     as_of: data[data.length - 1]!.date,
   }
 

@@ -24,21 +24,21 @@ export default async (
   )
 
   const dailyData: KVCache.Vaccinated = {
-    total: Number(daily.total_daily),
-    firstDose: Number(daily.dose1_daily),
-    secondDose: Number(daily.dose2_daily),
+    total: Number(daily.total_daily || 0),
+    firstDose: Number(daily.dose1_daily || 0),
+    secondDose: Number(daily.dose2_daily || 0),
     as_of: data[data.length - 1].date,
   }
   const weeklyData: KVCache.Vaccinated = {
-    total: Number(weekly.total_daily),
-    firstDose: Number(weekly.dose1_daily),
-    secondDose: Number(weekly.dose2_daily),
+    total: Number(weekly.total_daily || 0),
+    firstDose: Number(weekly.dose1_daily || 0),
+    secondDose: Number(weekly.dose2_daily || 0),
     as_of: data[data.length - 1].date,
   }
   const monthlyData: KVCache.Vaccinated = {
-    total: Number(monthly.total_daily),
-    firstDose: Number(monthly.dose1_daily),
-    secondDose: Number(monthly.dose2_daily),
+    total: Number(monthly.total_daily || 0),
+    firstDose: Number(monthly.dose1_daily || 0),
+    secondDose: Number(monthly.dose2_daily || 0),
     as_of: data[data.length - 1].date,
   }
 
