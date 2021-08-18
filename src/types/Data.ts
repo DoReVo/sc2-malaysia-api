@@ -19,12 +19,19 @@ export declare namespace API {
 
     interface Vaccinated {
       date: string
-      dose1_daily: string
-      dose2_daily: string
-      total_daily: string
-      dose1_cumul: string
-      dose2_cumul: string
-      total_cumul: string
+      daily_partial: string
+      daily_full: string
+      daily: string
+      cumul_partial: string
+      cumul_full: string
+      cumul: string
+      pfizer1: string
+      pfizer2: string
+      sinovac1: string
+      sinovac2: string
+      astra1: string
+      astra2: string
+      pending: string
     }
 
     interface AllKeys extends Cases, Deaths, Vaccinated {}

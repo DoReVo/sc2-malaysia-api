@@ -20,45 +20,45 @@ export default async (
 
   const { daily, weekly, monthly } = ExtractData<API.Malaysia.Vaccinated>(
     data,
-    ['total_daily', 'dose1_daily', 'dose2_daily'],
+    ['daily', 'daily_partial', 'daily_full'],
   )
 
   const dailyData: KVCache.Vaccinated & PerfomanceData<KVCache.Vaccinated> = {
-    total: Number(daily.total_daily ? daily.total_daily : 0),
-    firstDose: Number(daily.dose1_daily ? daily.dose1_daily : 0),
-    secondDose: Number(daily.dose2_daily ? daily.dose2_daily : 0),
+    total: Number(daily.daily ? daily.daily : 0),
+    firstDose: Number(daily.daily_partial ? daily.daily_partial : 0),
+    secondDose: Number(daily.daily_full ? daily.daily_full : 0),
     as_of: data[data.length - 1].date,
     perfomanceBetweenInterval: {
-      total: daily?.perfomanceBetweenInterval?.total_daily ?? (null as any),
-      firstDose: daily?.perfomanceBetweenInterval?.dose1_daily ?? (null as any),
-      secondDose:
-        daily?.perfomanceBetweenInterval?.dose2_daily ?? (null as any),
+      total: daily?.perfomanceBetweenInterval?.daily ?? (null as any),
+      firstDose:
+        daily?.perfomanceBetweenInterval?.daily_partial ?? (null as any),
+      secondDose: daily?.perfomanceBetweenInterval?.daily_full ?? (null as any),
     },
   }
   const weeklyData: KVCache.Vaccinated & PerfomanceData<KVCache.Vaccinated> = {
-    total: Number(weekly.total_daily ? weekly.total_daily : 0),
-    firstDose: Number(weekly.dose1_daily ? weekly.dose1_daily : 0),
-    secondDose: Number(weekly.dose2_daily ? weekly.dose2_daily : 0),
+    total: Number(weekly.daily ? weekly.daily : 0),
+    firstDose: Number(weekly.daily_partial ? weekly.daily_partial : 0),
+    secondDose: Number(weekly.daily_full ? weekly.daily_full : 0),
     as_of: data[data.length - 1].date,
     perfomanceBetweenInterval: {
-      total: weekly?.perfomanceBetweenInterval?.total_daily ?? (null as any),
+      total: weekly?.perfomanceBetweenInterval?.daily ?? (null as any),
       firstDose:
-        weekly?.perfomanceBetweenInterval?.dose1_daily ?? (null as any),
+        weekly?.perfomanceBetweenInterval?.daily_partial ?? (null as any),
       secondDose:
-        weekly?.perfomanceBetweenInterval?.dose2_daily ?? (null as any),
+        weekly?.perfomanceBetweenInterval?.daily_full ?? (null as any),
     },
   }
   const monthlyData: KVCache.Vaccinated & PerfomanceData<KVCache.Vaccinated> = {
-    total: Number(monthly.total_daily ? monthly.total_daily : 0),
-    firstDose: Number(monthly.dose1_daily ? monthly.dose1_daily : 0),
-    secondDose: Number(monthly.dose2_daily ? monthly.dose2_daily : 0),
+    total: Number(monthly.daily ? monthly.daily : 0),
+    firstDose: Number(monthly.daily_partial ? monthly.daily_partial : 0),
+    secondDose: Number(monthly.daily_full ? monthly.daily_full : 0),
     as_of: data[data.length - 1].date,
     perfomanceBetweenInterval: {
-      total: monthly?.perfomanceBetweenInterval?.total_daily ?? (null as any),
+      total: monthly?.perfomanceBetweenInterval?.daily ?? (null as any),
       firstDose:
-        monthly?.perfomanceBetweenInterval?.dose1_daily ?? (null as any),
+        monthly?.perfomanceBetweenInterval?.daily_partial ?? (null as any),
       secondDose:
-        monthly?.perfomanceBetweenInterval?.dose2_daily ?? (null as any),
+        monthly?.perfomanceBetweenInterval?.daily_full ?? (null as any),
     },
   }
 
