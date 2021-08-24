@@ -1,4 +1,5 @@
 import { Router } from 'tiny-request-router'
+import DashboardController from './controller/DashboardController'
 import { handleOptionsPreflight } from './controller/PreFlightController'
 import TotalCasesController from './controller/TotalCasesController'
 import TotalDeathController from './controller/TotalDeathController'
@@ -14,6 +15,7 @@ router.get('/', async () => {
 router.get('/total/:interval', TotalCasesController)
 router.get('/death/:interval', TotalDeathController)
 router.get('/vaccinated/:interval', TotalVaccinatedController)
+router.get('/dashboard', DashboardController)
 router.options('*', handleOptionsPreflight)
 
 export default router
